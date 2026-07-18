@@ -10,7 +10,7 @@ int nBin(int n)
         return 6;
 }
 
-void binary(int num, int bit[], int n)
+void convBin(int num, int bit[], int n)
 {
     for (int i = 0; i < n; i++)
     {
@@ -49,6 +49,7 @@ void addBin(int A[], int M[],int n)
         c = sum/2;
     }
 }
+
 void rightShift(int A[], int Q[], int *Qn, int n)
 {
     *Qn = Q[0];
@@ -58,6 +59,70 @@ void rightShift(int A[], int Q[], int *Qn, int n)
     for (int i = 1; i < n; i++) A[i - 1] = A[i];
     A[n-1] = s;
 }
+
+void checkCondition(int c, int A[], int Q[], int M[], int minusM[],int *Qn, int n)
+{
+    if(c==n)
+        {
+            printf(" %d     ",c);
+            display(A,n);
+            printf("   ");
+            display(Q,n);
+            printf("      %d", *Qn);
+            printf("    Initialize\n");
+        }
+        else if (Q[0]==0 && *Qn==0 || Q[0]==1 && *Qn==1)
+        {
+            rightShift(A, Q, Qn, n);
+            printf(" %d     ",c);
+            display(A,n);
+            printf("   ");
+            display(Q,n);
+            printf("      %d", *Qn);
+            printf("    Right Shift\n");
+        }
+        else if(Q[0]==1 && *Qn==0)
+        {
+            printf(" %d     ",c);
+            // A<- A-M => A<- A+(-M)
+            addBin(A,minusM,n);
+            //Right Shift
+            display(A,n);
+            printf("   ");
+            display(Q,n);
+            printf("      %d", *Qn);
+            printf("      A <- A-M\n");
+            rightShift(A, Q, Qn, n);
+            printf("       ");
+            display(A,n);
+            printf("   ");
+            display(Q,n);
+            printf("      %d", *Qn);
+            printf("    Right Shift\n");
+        }
+        else if(Q[0]==0 && *Qn==1)
+        {
+            printf(" %d     ",c);
+            // A<- A+M
+            addBin(A,M,n);
+            //Right Shift
+            display(A,n);
+            printf("   ");
+            display(Q,n);
+            printf("      %d", *Qn);
+            printf("      A <- A+M\n");
+            rightShift(A, Q, Qn, n);
+            printf("       ");
+            display(A,n);
+            printf("   ");
+            display(Q,n);
+            printf("      %d", *Qn);
+            printf("    Right Shift\n");
+        }
+        else
+            printf("Error");
+}
+
 int main()
 {
     // Accepting Two Numbers
@@ -69,11 +134,10 @@ int main()
     // Decimal -> binary
     int aN = nBin(a), bN = nBin(b);
     int n = aN > bN ? aN : bN;
-    int c = n;
     int M[n], Q[n], A[n], minusM[n];
     int Qn = 0;
-    binary(a, M, n);
-    binary(b, Q, n);
+    convBin(a, M, n);
+    convBin(b, Q, n);
     // Initialize A
     for(int i = 0; i < n; i++)
         A[i] = 0;
@@ -82,6 +146,8 @@ int main()
         Q[i] = Q[i];
     // Find -M 1s comp then 2s
     findMinusM(M,minusM,n);
+    
+    //Displaying
     printf("\nM in Binary: ");
     display(M,n);
     printf(" | ");
@@ -91,53 +157,9 @@ int main()
     printf("-M in Binary: ");
     display(minusM,n);
     printf("\n\n");
+
+    //Table
     printf("Count   A      Q      Qn-1     Action\n");
-    while(c)
-    {
-        if(c==n)
-        {
-            printf(" %d     ",c);
-            display(A,n);
-            printf("   ");
-            display(Q,n);
-            printf("      %d", Qn);
-            printf("    Initialize\n");
-        }
-        else if (Q[0]==0 && Qn==0 || Q[0]==1 && Qn==1)
-        {
-            rightShift(A, Q, &Qn, n);
-            printf(" %d     ",c);
-            display(A,n);
-            printf("   ");
-            display(Q,n);
-            printf("      %d", Qn);
-            printf("    Right Shift\n");
-        }
-        else if(Q[0]==1 && Qn==0)
-        {
-            printf(" %d     ",c);
-            // A<- A-M => A<- A+(-M)
-            addBin(A,minusM,n);
-            //Right Shift
-            display(A,n);
-            printf("   ");
-            display(Q,n);
-            printf("      %d", Qn);
-            printf("      A <- A-M\n");
-            rightShift(A, Q, &Qn, n);
-            printf("       ");
-            display(A,n);
-            printf("   ");
-            display(Q,n);
-            printf("      %d", Qn);
-            printf("    Right Shift\n");
-        }
-        c--;
-    }
-    printf(" 0     ");
-    display(A,n);
-    printf("   ");
-    display(Q,n);
-    printf("      %d", Qn);
-    printf("      Product\n");
+    for(int i = n;i>=0;i--)
+        checkCondition(i,A,Q,M,minusM,&Qn,n);
 }
